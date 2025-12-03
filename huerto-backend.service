@@ -1,0 +1,18 @@
+[Unit]
+Description=Huerto Hogar Backend Service
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/home/ec2-user/huerto-hogar-react/backend
+EnvironmentFile=/home/ec2-user/.env.huerto-backend
+ExecStart=/usr/bin/java -jar -Dspring.profiles.active=aws /home/ec2-user/huerto-hogar-react/backend/target/huerto-hogar-backend-1.0.0.jar
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
