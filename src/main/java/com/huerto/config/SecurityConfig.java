@@ -93,6 +93,9 @@ public class SecurityConfig {
                 // Endpoints de órdenes - requieren autenticación
                 .requestMatchers("/api/orders/**").authenticated()
                 
+                // Endpoints de PayPal - requieren autenticación
+                .requestMatchers("/api/paypal/**").authenticated()
+                
                 // Endpoints de administración
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/users/**").hasRole("ADMIN")

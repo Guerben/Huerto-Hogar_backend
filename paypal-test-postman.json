@@ -1,0 +1,253 @@
+{
+  "info": {
+    "name": "Huerto Hogar - PayPal Integration",
+    "description": "Collection para probar la integración de PayPal",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paypal_order_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\",\n  \"name\": \"Test User\",\n  \"phone\": \"+1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('auth_token', jsonData.token);",
+                  "    console.log('Token guardado:', jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('order_id', jsonData.id);",
+                  "    console.log('Order ID guardado:', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"name\": \"Producto de Prueba\",\n      \"price\": 29.99,\n      \"quantity\": 2,\n      \"image\": \"https://via.placeholder.com/150\"\n    },\n    {\n      \"productId\": 2,\n      \"name\": \"Otro Producto\",\n      \"price\": 39.99,\n      \"quantity\": 1,\n      \"image\": \"https://via.placeholder.com/150\"\n    }\n  ],\n  \"total\": 99.97,\n  \"subtotal\": 89.97,\n  \"shippingCost\": 10.00,\n  \"discount\": 0.00,\n  \"customer\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1234567890\",\n    \"address\": {\n      \"street\": \"123 Main St\",\n      \"city\": \"New York\",\n      \"state\": \"NY\",\n      \"postalCode\": \"10001\",\n      \"country\": \"US\"\n    }\n  },\n  \"paymentMethod\": \"PayPal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/orders/{{order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "{{order_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get My Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/orders/my-orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "my-orders"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. PayPal Integration",
+      "item": [
+        {
+          "name": "Create PayPal Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('paypal_order_id', jsonData.paypalOrderId);",
+                  "    console.log('PayPal Order ID:', jsonData.paypalOrderId);",
+                  "    console.log('Approval URL:', jsonData.approvalUrl);",
+                  "    console.log('');",
+                  "    console.log('⚠️ IMPORTANTE: Abre esta URL en tu navegador para aprobar el pago:');",
+                  "    console.log(jsonData.approvalUrl);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{order_id}},\n  \"amount\": 99.97,\n  \"currency\": \"USD\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/paypal/create-order",
+              "host": ["{{base_url}}"],
+              "path": ["api", "paypal", "create-order"]
+            }
+          }
+        },
+        {
+          "name": "Capture PayPal Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/paypal/capture-order/{{paypal_order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "paypal", "capture-order", "{{paypal_order_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get PayPal Order Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/paypal/order/{{paypal_order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "paypal", "order", "{{paypal_order_id}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+

@@ -52,6 +52,17 @@ public class Order {
     private CustomerInfo customer;
 
     private String paymentMethod;
+    
+    // PayPal payment information
+    private String paypalOrderId;
+    
+    private String paypalCaptureId;
+    
+    private String paypalPayerEmail;
+    
+    private String paypalPayerName;
+    
+    private String paypalPaymentStatus;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

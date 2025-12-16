@@ -22,6 +22,11 @@ public class OrderDTO {
     private String status;
     private CustomerInfoDTO customer;
     private String paymentMethod;
+    private String paypalOrderId;
+    private String paypalCaptureId;
+    private String paypalPayerEmail;
+    private String paypalPayerName;
+    private String paypalPaymentStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deliveredAt;
